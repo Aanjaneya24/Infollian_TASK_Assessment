@@ -1,36 +1,152 @@
-# Smart Load Balancer using Consistent Hashing
+# Overview
 
-## Project Overview
-This project is a backend-based load balancer system that routes incoming IP requests to backend nodes using a deterministic **Consistent Hashing** algorithm instead of random selection. 
+This project implements a **custom load balancer** using **consistent hashing** instead of random routing. It ensures that the same client IP is always routed to the same server node, even when nodes are added or removed.
 
 ## Features
-- **Consistent Hashing:** Hashing algorithm ensuring identical IP requests route to the same node with minimal rebalance over scaling.
-- **Node Management:** Add, remove, and toggle health status for node management dynamically.
-- **Weighted Routing:** Distribute traffic proportionally based on node capacities.
-- **Rate Limiting:** Protects backend layer against abuse and excessive traffic from single IPs.
-- **Request Logging & Metrics:** Access real-time simulation statistics and traffic load via APIs.
 
-## Architecture
-- **In-Memory Data Structures:** Stores virtual node hash rings and mappings synchronously without an external DB.
-- **REST APIs:** Express-driven web endpoints.
-- **Services:** Decoupled metrics, logger, rate-limiting, and load balancing engine.
+- Consistent Hashing (no random routing)
+- Same IP -> Same Node mapping
+- Balanced distribution using **Virtual Nodes**
+- Dynamic node addition/removal
+- Rate limiting (basic)
+- Request logging
+- Metrics dashboard (`/metrics` endpoint)
+
+---
+
+## Algorithm Used
+
+### Consistent Hashing
+
+Instead of randomly selecting a node, the system:
+
+1. Hashes the incoming IP address
+2. Hashes all server nodes
+3. Places both on a logical **hash ring**
+4. Routes the request to the nearest node on the ring
+
+### Why this approach?
+
+- Ensures **session consistency**
+- Minimizes redistribution when nodes change
+- Scales efficiently
+
+---
+
+## Improvement: Virtual Nodes
+
+Initially, using a single hash per node caused uneven distribution. To fix this, **virtual nodes** were introduced:
+
+- Each physical node is represented multiple times on the hash ring
+- This ensures **uniform load distribution** across all nodes
+
+---
+
+## API Endpoints
+
+### 1. Simulate Traffic
+
+```http
+POST /simulate
+```
+Simulates multiple requests with random IPs. *(Takes JSON body: `{ "requests": 100 }`)*
+
+### 2. View Metrics
+
+```http
+GET /metrics
+```
+Returns request count per node and general system statistics.
+
+### 3. Fetch Request Logs
+
+```http
+GET /logs
+```
+Returns a history of the routed IP addresses and their destination nodes.
+
+---
 
 ## Setup Instructions
-1. Navigate to the project root: `cd load-balancer`
-2. Install dependencies: `npm install`
-3. Run the development server: `npm start` (or `node src/server.js`)
-4. Use tools like cURL or Postman to communicate with the APIs running at `http://localhost:3000`.
 
-## API Documentation
-- `POST /simulate`: Hit this endpoint with a JSON body `{"requests": 100}` to mock traffic.
-- `GET /metrics`: Fetch total hits & nodes data.
-- `GET /logs`: In-memory list of recent queries.
-- `GET /nodes`: Fetch the current node list details.
-- `POST /nodes`: Define nodes using `{"name": "Node-D", "weight": 2}`.
-- `DELETE /nodes/:name`: Remove nodes gracefully.
-- `PATCH /nodes/:name/health`: Toggle `{"healthy": false}` on node failure instances.
+```bash
+npm install
+npm start
+```
+
+Server runs at:
+
+```bash
+http://localhost:3000
+```
+
+---
+
+## Example
+
+### Request:
+
+```http
+POST /simulate
+Content-Type: application/json
+
+{
+  "requests": 50
+}
+```
+
+### Response:
+
+```json
+{
+  "message": "Traffic simulation completed",
+  "totalSimulated": 50
+}
+```
+
+---
+
+## Metrics Example
+
+### `/metrics`
+
+```json
+{
+  "totalRequests": 150,
+  "blockedRequests": 0,
+  "activeNodes": 3,
+  "requestsPerNode": {
+    "Node-A": 48,
+    "Node-B": 54,
+    "Node-C": 48
+  }
+}
+```
+
+---
+
+## Why Not Random Routing?
+
+**Random routing:**
+- No consistency
+- Breaks sessions
+- Poor caching
+
+**Consistent hashing:**
+- Stable routing
+- Scalable
+- Production-friendly
+
+---
 
 ## Future Improvements
-- Adding Redis to maintain states in clusters.
-- Persistent logging layer on ElasticSearch/MongoDB.
-- WebSocket-powered UI dashboards.
+
+- Redis-based rate limiting
+- Health check system for nodes
+- Real-time dashboard (UI)
+
+---
+
+## Author
+
+Aanjaneya Pandey
