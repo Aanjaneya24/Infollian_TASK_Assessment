@@ -82,6 +82,16 @@ http://localhost:3000
 
 ---
 
+## Postman Collection Demo
+
+A Postman collection is included in the root folder (`postman_collection.json`). 
+To use it:
+1. Open Postman.
+2. Click **Import** and select the `postman_collection.json` file.
+3. Use the predefined requests to instantly simulate traffic, check metrics, and trigger failovers.
+
+---
+
 ## Example
 
 ### Request:
