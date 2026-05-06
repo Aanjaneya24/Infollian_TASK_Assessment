@@ -1,0 +1,137 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+		"name": "Smart Load Balancer Demo",
+		"description": "A collection to demonstrate the Smart Load Balancer utilizing Consistent Hashing, node health failovers, and weighted scaling.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Simulate Traffic",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"requests\": 100\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/simulate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"simulate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Distribution Metrics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/metrics",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"metrics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get Request Logs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/logs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"logs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Toggle Node-A Health (Failover Test)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"healthy\": false\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/nodes/Node-A/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"nodes",
+						"Node-A",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Add Weighted Node-Mega",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Node-Mega\",\n  \"weight\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/nodes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"nodes"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
