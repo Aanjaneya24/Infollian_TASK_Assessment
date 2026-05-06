@@ -14,6 +14,30 @@ This project implements a **custom load balancer** using **consistent hashing** 
 
 ---
 
+## Request Flow
+
+```mermaid
+flowchart TD
+    Client([Client Request]) --> |IP Address| RL{Rate Limiter}
+    
+    RL -->|Limit Exceeded| Block[Drop Request 429]
+    RL -->|Allowed| Hash[Generate MD5 Hash of IP]
+    
+    Hash --> Ring[(Consistent Hash Ring with Virtual Nodes)]
+    Ring --> BS[Binary Search O log N]
+    BS --> SelectedNode[Identify Nearest Node]
+    
+    SelectedNode --> Health{Is Physical Node Healthy?}
+    
+    Health -->|No| NextNode[Fallback to Next Clockwise Node]
+    NextNode --> Health
+    
+    Health -->|Yes| Route([Route Traffic to Node])
+    Route --> Log[(Update Metrics & Logs)]
+```
+
+---
+
 ## Algorithm Used
 
 ### Consistent Hashing
